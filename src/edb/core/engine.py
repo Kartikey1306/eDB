@@ -1,9 +1,9 @@
 """EoS eDB StorageEngine — SQLite-backed low-level storage layer."""
 from __future__ import annotations
+
 import sqlite3
 import threading
 from pathlib import Path
-from typing import Any
 
 
 class StorageEngine:
@@ -68,6 +68,6 @@ class StorageEngine:
         return f"StorageEngine(path={self._path!r})"
 
     @property
-    def engine(self) -> 'StorageEngine':
+    def engine(self) -> StorageEngine:
         """Self-reference for compatibility with code that calls .engine on StorageEngine."""
         return self

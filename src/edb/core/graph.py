@@ -1,8 +1,10 @@
 """EoS eDB GraphStore — directed property graph with BFS/DFS traversal."""
 from __future__ import annotations
+
 import json
 import uuid
 from typing import Any
+
 from .engine import StorageEngine
 
 _SCHEMA = """

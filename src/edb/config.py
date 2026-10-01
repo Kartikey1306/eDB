@@ -6,7 +6,6 @@ Uses Pydantic Settings to load configuration from environment variables and .env
 from __future__ import annotations
 
 import logging
-import os
 import secrets
 
 from pydantic import Field, model_validator
@@ -76,7 +75,7 @@ class EDBConfig(BaseSettings):
     ebot_openai_model: str = Field(default="gpt-3.5-turbo", description="OpenAI model for ebot")
 
     @model_validator(mode="after")
-    def _ensure_secrets(self) -> "EDBConfig":
+    def _ensure_secrets(self) -> EDBConfig:
         if not self.jwt_secret:
             self.jwt_secret = _generate_random_secret("EDB_JWT_SECRET")
         if not self.encryption_key:

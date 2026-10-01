@@ -1,9 +1,11 @@
 """EoS eDB RelationalStore — SQL table management on top of StorageEngine."""
 from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Any
+
 from .engine import StorageEngine
-from .models import ColumnDefinition, ColumnType, TableSchema
+from .models import ColumnType, TableSchema
 
 _TYPE_MAP = {
     ColumnType.INTEGER: "INTEGER",

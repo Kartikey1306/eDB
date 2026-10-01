@@ -1,10 +1,13 @@
 """EoS eDB DocumentStore — JSON document collections with schema-free storage."""
 from __future__ import annotations
+
 import json
-import uuid
 import time as _time
+import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
+
 from .engine import StorageEngine
 
 _SCHEMA = """
@@ -103,10 +106,7 @@ class DocumentStore:
         existing = self.find_by_id(collection, doc_id)
         if existing is None:
             return None
-        if merge:
-            new_data = {**existing.data, **data}
-        else:
-            new_data = data
+        new_data = {**existing.data, **data} if merge else data
         self._e.execute(
             "UPDATE _documents SET data = ? WHERE collection = ? AND doc_id = ?",
             (json.dumps(new_data), collection, doc_id),

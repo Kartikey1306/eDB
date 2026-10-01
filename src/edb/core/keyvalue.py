@@ -1,9 +1,11 @@
 """EoS eDB KeyValueStore — persistent KV with TTL, prefix scan, bulk ops."""
 from __future__ import annotations
+
 import json
 import time
 from dataclasses import dataclass
 from typing import Any
+
 from .engine import StorageEngine
 
 _CREATE = """
@@ -87,7 +89,7 @@ class KeyValueStore:
     def count(self) -> int:
         now = time.time()
         row = self._e.execute(
-            "SELECT COUNT(*) as c FROM _kv WHERE expires_at IS NULL OR expires_at >= ?", 
+            "SELECT COUNT(*) as c FROM _kv WHERE expires_at IS NULL OR expires_at >= ?",
             (now,)
         ).fetchone()
         return row["c"] if row else 0
@@ -96,27 +98,27 @@ class KeyValueStore:
         cur = self._e.execute("DELETE FROM _kv WHERE expires_at < ?", (time.time(),))
         self._e.commit()
         return cur.rowcount
-        
+
     def get_many(self, keys: list[str]) -> dict[str, Any]:
         if not keys:
             return {}
-        
+
         placeholders = ",".join(["?"] * len(keys))
         rows = self._e.execute(
-            f"SELECT key, value, expires_at FROM _kv WHERE key IN ({placeholders})", 
+            f"SELECT key, value, expires_at FROM _kv WHERE key IN ({placeholders})",
             tuple(keys)
         ).fetchall()
-        
+
         result = {}
         keys_to_delete = []
         now = time.time()
-        
+
         for r in rows:
             if r["expires_at"] is not None and now > r["expires_at"]:
                 keys_to_delete.append(r["key"])
             else:
                 result[r["key"]] = self._decode(r["value"])
-                
+
         if keys_to_delete:
             del_placeholders = ",".join(["?"] * len(keys_to_delete))
             self._e.execute("BEGIN TRANSACTION")
@@ -125,7 +127,7 @@ class KeyValueStore:
                 self._e.commit()
             except Exception:
                 self._e.execute("ROLLBACK")
-                
+
         return result
 
     def set_many(self, mapping: dict[str, Any], ttl: float | None = None) -> list[KVEntry]:
@@ -134,7 +136,7 @@ class KeyValueStore:
 
         expires_at = time.time() + ttl if ttl is not None else None
         batch = [(k, self._encode(v), expires_at) for k, v in mapping.items()]
-        
+
         self._e.execute("BEGIN TRANSACTION")
         try:
             for args in batch:
@@ -143,9 +145,9 @@ class KeyValueStore:
         except Exception as e:
             self._e.execute("ROLLBACK")
             raise e
-            
+
         return [KVEntry(key=k, value=v, expires_at=expires_at) for k, v in mapping.items()]
-        
+
     def clear(self) -> int:
         cur = self._e.execute("DELETE FROM _kv")
         self._e.commit()
