@@ -113,7 +113,7 @@ class QueryPlanner:
                     query_type=QueryType.SQL,
                     error="Raw query requires 'raw_sql'",
                 )
-            params = tuple(q.params) if q.params else None
+            params = tuple(q.params) if q.params else ()
             result = store.execute_raw(q.raw_sql, params)
             return UnifiedQueryResult(
                 query_type=QueryType.SQL,
@@ -129,8 +129,11 @@ class QueryPlanner:
                     query_type=QueryType.SQL,
                     error="create_table requires 'data' with 'columns' list",
                 )
-            columns = [ColumnDefinition(**col) for col in q.data["columns"]]
-            schema = TableSchema(name=q.table, columns=columns)
+            # `columns` is already bound as list[str] earlier in this
+            # function (line 61), so build the ColumnDefinitions under a
+            # fresh name instead of reusing it.
+            col_defs = [ColumnDefinition(**col) for col in q.data["columns"]]
+            schema = TableSchema(name=q.table, columns=col_defs)
             store.create_table(schema)
             return UnifiedQueryResult(query_type=QueryType.SQL, data={"table_created": q.table})
 
@@ -280,7 +283,7 @@ class QueryPlanner:
             )
 
         elif q.action == "list":
-            keys = store.list_keys(q.prefix)
+            keys = store.list_keys(q.prefix or "")
             return UnifiedQueryResult(query_type=QueryType.KV, data=keys, row_count=len(keys))
 
         elif q.action == "exists":
@@ -298,3 +301,4 @@ class QueryPlanner:
         return UnifiedQueryResult(
             success=False, query_type=QueryType.KV, error=f"Unknown KV action: {q.action}"
         )
+

@@ -128,9 +128,10 @@ class DocumentStore:
         row = self._e.fetchone(
             "SELECT COUNT(*) FROM _documents WHERE collection = ?", (collection,)
         )
-        return row[0]
+        return int(row[0]) if row is not None else 0
 
     def drop_collection(self, name: str) -> None:
         self._e.execute("DELETE FROM _documents WHERE collection = ?", (name,))
         self._e.execute("DELETE FROM _doc_collections WHERE name = ?", (name,))
         self._e.commit()
+

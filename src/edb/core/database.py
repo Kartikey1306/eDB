@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Generator
 from contextlib import contextmanager
+from types import TracebackType
 
 from .document import DocumentStore
 from .engine import StorageEngine
@@ -37,7 +38,12 @@ class Database:
     def __enter__(self) -> Database:
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         self.close()
 
     @property
@@ -66,3 +72,4 @@ class Database:
     # ── Repr ─────────────────────────────────────────────────────────────────
     def __repr__(self) -> str:
         return f"Database(path={self._path!r})"
+
