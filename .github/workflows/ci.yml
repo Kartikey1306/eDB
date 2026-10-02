@@ -12,9 +12,15 @@ jobs:
   test:
     name: Test (Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
+    # Every step here is written in bash (backslashes, $(...)). Without this
+    # the Windows legs run them under PowerShell, where the multi-line
+    # pytest invocation below is a parse error and the job goes red.
+    defaults:
+      run:
+        shell: bash
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.12", "3.13"]
         os: [ubuntu-22.04, macos-13, windows-2022]
       fail-fast: false
 
@@ -100,3 +106,4 @@ jobs:
         with:
           files: dist/*
           generate_release_notes: true
+
