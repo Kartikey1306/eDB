@@ -4,7 +4,7 @@ from edb.core.database import Database
 from edb.core.models import ColumnDefinition, ColumnType, TableSchema
 
 
-def main():
+def main() -> None:
     # Create an in-memory database
     db = Database(":memory:")
 

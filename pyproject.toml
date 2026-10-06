@@ -75,7 +75,15 @@ ignore = ["E501"]
 
 [tool.mypy]
 python_version = "3.11"
+# tests_backup/ is not collected by CI and no longer matches the API
+# (e.g. UserManager.ensure_admin_exists now takes username and password).
+exclude = ["^tests_backup/"]
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+# Test functions are not required to carry annotations.
+module = ["tests.*"]
+disallow_untyped_defs = false

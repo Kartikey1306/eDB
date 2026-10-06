@@ -2,7 +2,7 @@
 import sys
 import subprocess
 
-def main():
+def main() -> None:
     print("=== Running all production-ready tests via pytest ===")
     result = subprocess.run(["pytest", "tests/unit", "tests/functional", "tests/performance", "tests/simulation", "-v"], capture_output=False)
     sys.exit(result.returncode)
