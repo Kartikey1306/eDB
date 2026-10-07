@@ -92,5 +92,9 @@ check_untyped_defs = true
 # annotations (251 no-untyped-def errors on master). The shipped package in
 # src/edb keeps the strict setting above.
 [[tool.mypy.overrides]]
-module = ["tests.*", "tests_backup.*", "run_all_tests", "quickstart"]
+module = ["tests.*", "run_all_tests", "quickstart",
+    "test_audit", "test_database", "test_document", "test_encryption",
+    "test_fts", "test_graph", "test_input_validation", "test_jwt",
+    "test_keyvalue", "test_parser", "test_planner", "test_rbac",
+    "test_relational", "test_sanitizer", "test_translator", "test_users"]
 disallow_untyped_defs = false
