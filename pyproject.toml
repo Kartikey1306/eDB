@@ -86,3 +86,11 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 check_untyped_defs = true
+
+# Tests, backup tests, and example/runner scripts are not shipped; they are
+# still body-checked (check_untyped_defs) but are not required to carry full
+# annotations (251 no-untyped-def errors on master). The shipped package in
+# src/edb keeps the strict setting above.
+[[tool.mypy.overrides]]
+module = ["tests.*", "tests_backup.*", "run_all_tests", "quickstart"]
+disallow_untyped_defs = false
